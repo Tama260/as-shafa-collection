@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          alamat_pengiriman: string
+          catatan_tambahan: string | null
+          created_at: string
+          id: string
+          jumlah_pesanan: number
+          nama_lengkap: string
+          nomor_whatsapp: string
+          produk: string
+          status_order: string
+          ukuran: string | null
+          variasi_produk: string | null
+        }
+        Insert: {
+          alamat_pengiriman: string
+          catatan_tambahan?: string | null
+          created_at?: string
+          id?: string
+          jumlah_pesanan?: number
+          nama_lengkap: string
+          nomor_whatsapp: string
+          produk: string
+          status_order?: string
+          ukuran?: string | null
+          variasi_produk?: string | null
+        }
+        Update: {
+          alamat_pengiriman?: string
+          catatan_tambahan?: string | null
+          created_at?: string
+          id?: string
+          jumlah_pesanan?: number
+          nama_lengkap?: string
+          nomor_whatsapp?: string
+          produk?: string
+          status_order?: string
+          ukuran?: string | null
+          variasi_produk?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

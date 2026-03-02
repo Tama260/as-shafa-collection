@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { X, CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { Product, formatPrice } from "@/data/products";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface OrderModalProps {
   product: Product | null;
@@ -16,6 +19,8 @@ interface OrderModalProps {
 
 const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const [form, setForm] = useState({
     nama: "",
     whatsapp: "",
@@ -30,10 +35,34 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate submission
-    setSubmitted(true);
+    if (!product || loading) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("orders").insert({
+        nama_lengkap: form.nama.trim(),
+        nomor_whatsapp: form.whatsapp.trim(),
+        alamat_pengiriman: form.alamat.trim(),
+        produk: product.name,
+        variasi_produk: form.variasi || null,
+        ukuran: form.ukuran || null,
+        jumlah_pesanan: parseInt(form.jumlah) || 1,
+        catatan_tambahan: form.catatan.trim() || null,
+      });
+
+      if (error) throw error;
+      setSubmitted(true);
+    } catch {
+      toast({
+        title: "Gagal mengirim pesanan",
+        description: "Silakan coba lagi nanti.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -53,143 +82,168 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
           </DialogTitle>
         </DialogHeader>
 
-        {submitted ? (
-          <div className="text-center py-8">
-            <CheckCircle2 className="w-16 h-16 text-secondary mx-auto mb-4" />
-            <h3 className="font-display text-lg font-semibold text-foreground mb-2">
-              Terima Kasih!
-            </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Pesanan berhasil dikirim. Tim As-Shafa Shop akan segera menghubungi Anda.
-            </p>
-            <button
-              onClick={handleClose}
-              className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-plum-light transition-colors"
+        <AnimatePresence mode="wait">
+          {submitted ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-center py-8"
             >
-              Tutup
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Product info */}
-            <div className="bg-muted/50 rounded-xl p-4 mb-2">
-              <p className="text-sm font-medium text-foreground">{product.name}</p>
-              <p className="text-sm text-secondary font-semibold">{formatPrice(product.price)}</p>
-            </div>
+              <CheckCircle2 className="w-16 h-16 text-secondary mx-auto mb-4" />
+              <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                Pesanan berhasil dikirim!
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                Tim As-Shafa Shop akan segera menghubungi Anda melalui WhatsApp.
+              </p>
+              <button
+                onClick={handleClose}
+                className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-plum-light transition-colors"
+              >
+                Tutup
+              </button>
+            </motion.div>
+          ) : (
+            <motion.form
+              key="form"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
+              {/* Product info */}
+              <div className="bg-muted/50 rounded-xl p-4 mb-2">
+                <p className="text-sm font-medium text-foreground">{product.name}</p>
+                <p className="text-sm text-secondary font-semibold">{formatPrice(product.price)}</p>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Nama Lengkap *</label>
-              <input
-                name="nama"
-                required
-                value={form.nama}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                placeholder="Masukkan nama lengkap"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Nomor WhatsApp *</label>
-              <input
-                name="whatsapp"
-                required
-                value={form.whatsapp}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                placeholder="08xxxxxxxxxx"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Alamat Pengiriman *</label>
-              <textarea
-                name="alamat"
-                required
-                value={form.alamat}
-                onChange={handleChange}
-                rows={2}
-                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none"
-                placeholder="Alamat lengkap pengiriman"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Produk Dipilih</label>
-              <input
-                readOnly
-                value={product.name}
-                className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-muted-foreground text-sm cursor-not-allowed"
-              />
-            </div>
-
-            {product.variations && product.variations.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Variasi Produk</label>
-                <select
-                  name="variasi"
-                  value={form.variasi}
+                <label className="block text-sm font-medium text-foreground mb-1">Nama Lengkap *</label>
+                <input
+                  name="nama"
+                  required
+                  value={form.nama}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                >
-                  <option value="">Pilih variasi</option>
-                  {product.variations.map((v) => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
-                </select>
+                  placeholder="Masukkan nama lengkap"
+                />
               </div>
-            )}
 
-            {product.sizes && product.sizes.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Ukuran</label>
-                <select
-                  name="ukuran"
-                  value={form.ukuran}
+                <label className="block text-sm font-medium text-foreground mb-1">Nomor WhatsApp *</label>
+                <input
+                  name="whatsapp"
+                  required
+                  value={form.whatsapp}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                >
-                  <option value="">Pilih ukuran</option>
-                  {product.sizes.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+                  placeholder="08xxxxxxxxxx"
+                />
               </div>
-            )}
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Jumlah Pesanan *</label>
-              <input
-                name="jumlah"
-                type="number"
-                min="1"
-                required
-                value={form.jumlah}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Alamat Pengiriman *</label>
+                <textarea
+                  name="alamat"
+                  required
+                  value={form.alamat}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none"
+                  placeholder="Alamat lengkap pengiriman"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Catatan Tambahan</label>
-              <textarea
-                name="catatan"
-                value={form.catatan}
-                onChange={handleChange}
-                rows={2}
-                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none"
-                placeholder="Catatan khusus (opsional)"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Produk Dipilih</label>
+                <input
+                  readOnly
+                  value={product.name}
+                  className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-muted-foreground text-sm cursor-not-allowed"
+                />
+              </div>
 
-            <button
-              type="submit"
-              className="w-full py-3 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-plum-light transition-colors shadow-sm mt-2"
-            >
-              Kirim Pesanan
-            </button>
-          </form>
-        )}
+              {product.variations && product.variations.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Variasi Produk</label>
+                  <select
+                    name="variasi"
+                    value={form.variasi}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                  >
+                    <option value="">Pilih variasi</option>
+                    {product.variations.map((v) => (
+                      <option key={v} value={v}>{v}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {product.sizes && product.sizes.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Ukuran</label>
+                  <select
+                    name="ukuran"
+                    value={form.ukuran}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                  >
+                    <option value="">Pilih ukuran</option>
+                    {product.sizes.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Jumlah Pesanan *</label>
+                <input
+                  name="jumlah"
+                  type="number"
+                  min="1"
+                  required
+                  value={form.jumlah}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Catatan Tambahan</label>
+                <textarea
+                  name="catatan"
+                  value={form.catatan}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none"
+                  placeholder="Catatan khusus (opsional)"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-plum-light transition-colors shadow-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  "Kirim Pesanan"
+                )}
+              </button>
+            </motion.form>
+          )}
+        </AnimatePresence>
       </DialogContent>
     </Dialog>
   );
