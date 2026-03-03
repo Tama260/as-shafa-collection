@@ -3,6 +3,20 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { Product, formatPrice } from "@/data/products";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+const orderSchema = z.object({
+  nama: z.string().trim().min(1, "Nama wajib diisi").max(200, "Nama maksimal 200 karakter"),
+  whatsapp: z.string().trim().regex(/^08[0-9]{8,11}$/, "Format nomor WhatsApp tidak valid (contoh: 08xxxxxxxxxx)"),
+  alamat: z.string().trim().min(1, "Alamat wajib diisi").max(500, "Alamat maksimal 500 karakter"),
+  variasi: z.string().max(200).optional(),
+  ukuran: z.string().max(100).optional(),
+  jumlah: z.string().refine((v) => {
+    const n = parseInt(v);
+    return !isNaN(n) && n >= 1 && n <= 999;
+  }, "Jumlah harus antara 1-999"),
+  catatan: z.string().max(1000, "Catatan maksimal 1000 karakter").optional(),
+});
 import {
   Dialog,
   DialogContent,
@@ -35,9 +49,22 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product || loading) return;
+
+    const result = orderSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
 
     setLoading(true);
     try {
@@ -127,11 +154,13 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
                 <input
                   name="nama"
                   required
+                  maxLength={200}
                   value={form.nama}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
                   placeholder="Masukkan nama lengkap"
                 />
+                {errors.nama && <p className="text-destructive text-xs mt-1">{errors.nama}</p>}
               </div>
 
               <div>
@@ -139,11 +168,13 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
                 <input
                   name="whatsapp"
                   required
+                  maxLength={13}
                   value={form.whatsapp}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
                   placeholder="08xxxxxxxxxx"
                 />
+                {errors.whatsapp && <p className="text-destructive text-xs mt-1">{errors.whatsapp}</p>}
               </div>
 
               <div>
@@ -151,12 +182,14 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
                 <textarea
                   name="alamat"
                   required
+                  maxLength={500}
                   value={form.alamat}
                   onChange={handleChange}
                   rows={2}
                   className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none"
                   placeholder="Alamat lengkap pengiriman"
                 />
+                {errors.alamat && <p className="text-destructive text-xs mt-1">{errors.alamat}</p>}
               </div>
 
               <div>
@@ -208,17 +241,20 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
                   name="jumlah"
                   type="number"
                   min="1"
+                  max="999"
                   required
                   value={form.jumlah}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-secondary/40"
                 />
+                {errors.jumlah && <p className="text-destructive text-xs mt-1">{errors.jumlah}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Catatan Tambahan</label>
                 <textarea
                   name="catatan"
+                  maxLength={1000}
                   value={form.catatan}
                   onChange={handleChange}
                   rows={2}
