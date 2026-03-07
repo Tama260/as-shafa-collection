@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Instagram } from "lucide-react";
+import { MapPin, Phone, Instagram } from "lucide-react";
 import logo from "@/assets/logo.jpeg";
 
 const FooterSection = () => {
@@ -23,15 +23,11 @@ const FooterSection = () => {
             <ul className="space-y-3 text-sm text-primary-foreground/70">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>+62 812-3456-7890</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>hello@asshafashop.id</span>
+                <span>+62 814-1227-5939</span>
               </li>
               <li className="flex items-start gap-2">
                 <Instagram className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>@asshafa.shop</span>
+                <span>as.shafa.collection</span>
               </li>
             </ul>
           </div>
@@ -41,7 +37,7 @@ const FooterSection = () => {
             <h4 className="font-display font-semibold text-base mb-4">Alamat</h4>
             <div className="flex items-start gap-2 text-sm text-primary-foreground/70">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>Jl. Raya Batik No. 88, Pekalongan, Jawa Tengah, Indonesia</span>
+              <span>As Shafa Shop, Jalan G Kerinci II No. 18, Kendayakan, KAB. SERANG, KRAGILAN, BANTEN, ID, 42184</span>
             </div>
           </div>
         </div>
