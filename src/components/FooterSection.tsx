@@ -37,7 +37,7 @@ const FooterSection = () => {
             <h4 className="font-display font-semibold text-base mb-4">Alamat</h4>
             <div className="flex items-start gap-2 text-sm text-primary-foreground/70">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>Jl. Raya Batik No. 88, Pekalongan, Jawa Tengah, Indonesia</span>
+              <span>As Shafa Shop, Jalan G Kerinci II No. 18, Kendayakan, KAB. SERANG, KRAGILAN, BANTEN, ID, 42184</span>
             </div>
           </div>
         </div>
