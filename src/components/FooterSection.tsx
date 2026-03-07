@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Instagram } from "lucide-react";
+import { MapPin, Phone, Instagram } from "lucide-react";
 import logo from "@/assets/logo.jpeg";
 
 const FooterSection = () => {
