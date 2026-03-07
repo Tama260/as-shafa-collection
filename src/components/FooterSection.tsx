@@ -23,15 +23,11 @@ const FooterSection = () => {
             <ul className="space-y-3 text-sm text-primary-foreground/70">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>+62 812-3456-7890</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>hello@asshafashop.id</span>
+                <span>+62 814-1227-5939</span>
               </li>
               <li className="flex items-start gap-2">
                 <Instagram className="w-4 h-4 mt-0.5 shrink-0" />
-                <span>@asshafa.shop</span>
+                <span>as.shafa.collection</span>
               </li>
             </ul>
           </div>
