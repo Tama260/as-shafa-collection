@@ -2,7 +2,8 @@
 
 ## Project info
 
-**URL**: https://github.com/Tama260/as-shafa-collection.git
+**URL**:  https://as-shafa-collection.lovable.app/ or https://as-shafa-collection.vercel.app/
+Deployment: https://vercel.com/tama260s-projects/as-shafa-collection/D5p6qSvXZ2SXXcYuuZPew9z9faHQ
 
 ## How can I edit this code?
 
@@ -10,7 +11,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://as-shafa-collection.lovable.app/) and start prompting.
+Simply visit the [Lovable Project](https://github.com/Tama260/as-shafa-collection.git) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
