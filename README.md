@@ -5,6 +5,7 @@
 **URL**:  https://as-shafa-collection.lovable.app/ or https://as-shafa-collection.vercel.app/
 
 Deployment: https://vercel.com/tama260s-projects/as-shafa-collection/D5p6qSvXZ2SXXcYuuZPew9z9faHQ
+Domain: https://asshafashop.dpdns.org/
 
 ## How can I edit this code?
 
