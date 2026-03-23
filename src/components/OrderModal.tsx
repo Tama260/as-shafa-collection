@@ -78,20 +78,23 @@ const OrderModal = ({ product, open, onClose }: OrderModalProps) => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.from("orders").insert({
-        order_id: newOrderId,
-        nama_lengkap: form.nama.trim(),
-        nomor_whatsapp: form.whatsapp.trim(),
-        alamat_pengiriman: form.alamat.trim(),
-        produk_dipilih: product.name,
-        variasi_produk: form.variasi || null,
-        ukuran: form.ukuran || null,
-        jumlah_pesanan: parseInt(form.jumlah) || 1,
-        metode_pembayaran: form.metode_pembayaran,
-        catatan_tambahan: form.catatan.trim() || null,
+      const { data, error } = await supabase.functions.invoke("submit-order", {
+        body: {
+          order_id: newOrderId,
+          nama_lengkap: form.nama.trim(),
+          nomor_whatsapp: form.whatsapp.trim(),
+          alamat_pengiriman: form.alamat.trim(),
+          produk_dipilih: product.name,
+          variasi_produk: form.variasi || null,
+          ukuran: form.ukuran || null,
+          jumlah_pesanan: parseInt(form.jumlah) || 1,
+          metode_pembayaran: form.metode_pembayaran,
+          catatan_tambahan: form.catatan.trim() || null,
+        },
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       setOrderId(newOrderId);
       setSubmitted(true);
