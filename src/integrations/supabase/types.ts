@@ -18,62 +18,162 @@ export type Database = {
         Row: {
           alamat_pengiriman: string
           catatan_tambahan: string | null
-          created_at: string
+          created_at: string | null
           id: string
           jumlah_pesanan: number
+          metode_pembayaran: string
           nama_lengkap: string
           nomor_whatsapp: string
-          produk: string
-          status_order: string
+          order_id: string
+          produk_dipilih: string
+          status: string | null
           ukuran: string | null
-          user_id: string | null
           variasi_produk: string | null
         }
         Insert: {
           alamat_pengiriman: string
           catatan_tambahan?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
           jumlah_pesanan?: number
+          metode_pembayaran: string
           nama_lengkap: string
           nomor_whatsapp: string
-          produk: string
-          status_order?: string
+          order_id: string
+          produk_dipilih: string
+          status?: string | null
           ukuran?: string | null
-          user_id?: string | null
           variasi_produk?: string | null
         }
         Update: {
           alamat_pengiriman?: string
           catatan_tambahan?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
           jumlah_pesanan?: number
+          metode_pembayaran?: string
           nama_lengkap?: string
           nomor_whatsapp?: string
-          produk?: string
-          status_order?: string
+          order_id?: string
+          produk_dipilih?: string
+          status?: string | null
           ukuran?: string | null
-          user_id?: string | null
           variasi_produk?: string | null
         }
         Relationships: []
       }
-      user_roles: {
+      product_sizes: {
         Row: {
           id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          product_id: string | null
+          size_name: string
         }
         Insert: {
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          product_id?: string | null
+          size_name: string
         }
         Update: {
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
+          product_id?: string | null
+          size_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_sizes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          id: string
+          product_id: string | null
+          variant_name: string
+        }
+        Insert: {
+          id?: string
+          product_id?: string | null
+          variant_name: string
+        }
+        Update: {
+          id?: string
+          product_id?: string | null
+          variant_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          rating: number | null
+          review_count: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          rating?: number | null
+          review_count?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          rating?: number | null
+          review_count?: number | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          created_at: string | null
+          id: string
+          isi_testimoni: string
+          kota: string | null
+          nama: string
+          rating: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          isi_testimoni: string
+          kota?: string | null
+          nama: string
+          rating?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          isi_testimoni?: string
+          kota?: string | null
+          nama?: string
+          rating?: number | null
         }
         Relationships: []
       }
@@ -82,16 +182,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -218,8 +312,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "moderator", "user"],
-    },
+    Enums: {},
   },
 } as const
