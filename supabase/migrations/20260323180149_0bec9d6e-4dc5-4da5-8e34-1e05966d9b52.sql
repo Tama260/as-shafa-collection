@@ -1,0 +1,1 @@
+DROP POLICY "Allow anonymous order insertion" ON public.orders;
